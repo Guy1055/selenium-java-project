@@ -4,6 +4,7 @@ import com.toolshop.core.Env;
 import org.openqa.selenium.By;
 import org.openqa.selenium.ElementClickInterceptedException;
 import org.openqa.selenium.ElementNotInteractableException;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
@@ -55,6 +56,16 @@ public abstract class BasePage {
         WebElement element = wait.until(ExpectedConditions.elementToBeClickable(by));
         element.clear();
         element.sendKeys(text);
+    }
+
+    /** sendKeys on a native date input depends on the browser locale, so set the ISO value directly. */
+    public void setDate(By by, String isoDate) {
+        WebElement element = wait.until(ExpectedConditions.elementToBeClickable(by));
+        ((JavascriptExecutor) driver).executeScript(
+                "arguments[0].value = arguments[1];"
+                        + "arguments[0].dispatchEvent(new Event('input', {bubbles: true}));"
+                        + "arguments[0].dispatchEvent(new Event('change', {bubbles: true}));",
+                element, isoDate);
     }
 
     public void selectValue(By by, String value) {
