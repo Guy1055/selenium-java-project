@@ -23,10 +23,15 @@ public class CartPage extends BasePage {
         waitVisible(TITLES);
     }
 
-    /** The cart input updates on the change event, so commit with Tab. */
+    /**
+     * The cart input updates on the change event, so commit with Tab. One atomic retried action,
+     * because clearing the field first would fire a change and re-render the row.
+     */
     public void setQuantity(int quantity) {
-        type(QUANTITIES, String.valueOf(quantity));
-        driver.findElement(QUANTITIES).sendKeys(Keys.TAB);
+        wait.until(d -> {
+            d.findElement(QUANTITIES).sendKeys(Keys.chord(Keys.CONTROL, "a"), String.valueOf(quantity), Keys.TAB);
+            return true;
+        });
     }
 
     public void removeFirstItem() {
