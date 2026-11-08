@@ -47,7 +47,7 @@ public class AdminFormPage extends BasePage {
     public void fillUser(String firstName, String lastName, String email, String password) {
         type(testId("first-name"), firstName);
         type(testId("last-name"), lastName);
-        type(testId("dob"), "1990-01-15");
+        setDate(testId("dob"), "1990-01-15");
         selectValue(testId("country"), "NL");
         type(testId("postal_code"), "1011AB");
         type(testId("street"), "Test Street");
