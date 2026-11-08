@@ -2,9 +2,12 @@ package com.toolshop.pages;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
 
 public class AccountPage extends BasePage {
-    public static final By TITLE = testId("page-title");
+    @FindBy(css = "[data-test='page-title']")
+    public WebElement title;
 
     public AccountPage(WebDriver driver) {
         super(driver);

@@ -1,19 +1,51 @@
 package com.toolshop.pages;
 
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
 
 public class ProfilePage extends BasePage {
-    public static final By FIRST_NAME = testId("first-name");
-    public static final By LAST_NAME = testId("last-name");
-    public static final By EMAIL = testId("email");
-    public static final By UPDATE_SUBMIT = testId("update-profile-submit");
-    public static final By TOTP_SECRET = testId("totp-secret");
-    public static final By TOTP_CODE = testId("totp-code");
-    public static final By TOTP_VERIFY = testId("verify-totp");
-    public static final By TOTP_ERROR = testId("totp-error");
-    public static final By SUCCESS = By.cssSelector(".alert-success");
-    public static final By FAILURE = By.cssSelector(".alert-danger");
+    @FindBy(css = "[data-test='first-name']")
+    public WebElement firstName;
+
+    @FindBy(css = "[data-test='last-name']")
+    public WebElement lastName;
+
+    @FindBy(css = "[data-test='email']")
+    public WebElement email;
+
+    @FindBy(css = "[data-test='update-profile-submit']")
+    public WebElement updateSubmit;
+
+    @FindBy(css = "[data-test='totp-secret']")
+    public WebElement totpSecret;
+
+    @FindBy(css = "[data-test='totp-code']")
+    public WebElement totpCode;
+
+    @FindBy(css = "[data-test='verify-totp']")
+    public WebElement totpVerify;
+
+    @FindBy(css = "[data-test='totp-error']")
+    public WebElement totpError;
+
+    @FindBy(css = ".alert-success")
+    public WebElement success;
+
+    @FindBy(css = ".alert-danger")
+    public WebElement failure;
+
+    @FindBy(css = "[data-test='current-password']")
+    private WebElement currentPassword;
+
+    @FindBy(css = "[data-test='new-password']")
+    private WebElement newPassword;
+
+    @FindBy(css = "[data-test='new-password-confirm']")
+    private WebElement newPasswordConfirm;
+
+    @FindBy(css = "[data-test='change-password-submit']")
+    private WebElement changePasswordSubmit;
 
     public ProfilePage(WebDriver driver) {
         super(driver);
@@ -24,9 +56,9 @@ public class ProfilePage extends BasePage {
     }
 
     public void changePassword(String current, String next) {
-        type(testId("current-password"), current);
-        type(testId("new-password"), next);
-        type(testId("new-password-confirm"), next);
-        click(testId("change-password-submit"));
+        type(currentPassword, current);
+        type(newPassword, next);
+        type(newPasswordConfirm, next);
+        click(changePasswordSubmit);
     }
 }

@@ -9,11 +9,13 @@ import org.testng.annotations.Test;
 public class HomeTest extends BaseUiTest {
     @Test(description = "CAT-01: shows the product catalog", groups = "sanity")
     public void showsCatalog() {
-        new HomePage(driver()).open();
+        NavBar nav = new NavBar(driver());
+        HomePage home = new HomePage(driver());
+        home.open();
 
         expect().condition("title to mention Toolshop", () -> driver().getTitle().contains("Toolshop"));
-        expect().visible(NavBar.SIGN_IN);
-        expect().visible(HomePage.PRODUCT_NAMES);
+        expect().visible(nav.signIn);
+        expect().visible(home.productName);
     }
 
     @Test(description = "CAT-02: searching narrows the product list", groups = "sanity")
@@ -23,7 +25,7 @@ public class HomeTest extends BaseUiTest {
 
         home.search("hammer");
 
-        expect().visible(HomePage.PRODUCT_NAMES);
-        Assert.assertTrue(home.text(HomePage.PRODUCT_NAMES).toLowerCase().contains("hammer"));
+        expect().visible(home.productName);
+        Assert.assertTrue(home.text(home.productName).toLowerCase().contains("hammer"));
     }
 }

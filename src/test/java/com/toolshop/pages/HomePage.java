@@ -4,28 +4,69 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
 
 import java.util.List;
 
 public class HomePage extends BasePage {
-    public static final By SEARCH_INPUT = testId("search-query");
-    public static final By SEARCH_SUBMIT = testId("search-submit");
-    public static final By SEARCH_RESET = testId("search-reset");
-    public static final By SEARCH_CAPTION = testId("search-caption");
-    public static final By NO_RESULTS = testId("no-results");
-    public static final By PRODUCT_NAMES = testId("product-name");
-    public static final By PRODUCT_PRICES = testId("product-price");
-    public static final By SORT = testId("sort");
-    public static final By NEXT_PAGE = testId("pagination-next");
-    public static final By ECO_FILTER = testId("eco-friendly-filter");
-    public static final By ECO_BADGES = testId("eco-badge");
-    public static final By COMPARE_BUTTONS = testId("compare-btn");
-    public static final By COMPARISON_BAR = testId("comparison-bar");
-    public static final By COMPARE_LINK = testId("compare-link");
-    public static final By CLEAR_COMPARISON = testId("clear-comparison");
-    public static final By PRICE_MAX_SLIDER = By.cssSelector("[role='slider'][aria-label='ngx-slider-max']");
+    /** Searched inside one card, which @FindBy cannot express. */
+    private static final By CARD_NAME = testId("product-name");
+    private static final By CARD_OUT_OF_STOCK = testId("out-of-stock");
+
+    @FindBy(css = "[data-test='search-query']")
+    public WebElement searchInput;
+
+    @FindBy(css = "[data-test='search-submit']")
+    public WebElement searchSubmit;
+
+    @FindBy(css = "[data-test='search-reset']")
+    public WebElement searchReset;
+
+    @FindBy(css = "[data-test='search-caption']")
+    public WebElement searchCaption;
+
+    @FindBy(css = "[data-test='no-results']")
+    public WebElement noResults;
+
+    @FindBy(css = "[data-test='product-name']")
+    public WebElement productName;
+
+    @FindBy(css = "[data-test='product-name']")
+    public List<WebElement> productNames;
+
+    @FindBy(css = "[data-test='product-price']")
+    public List<WebElement> productPrices;
+
+    @FindBy(css = "[data-test='sort']")
+    public WebElement sort;
+
+    @FindBy(css = "[data-test='pagination-next']")
+    public WebElement nextPage;
+
+    @FindBy(css = "[data-test='eco-friendly-filter']")
+    public WebElement ecoFilter;
+
+    @FindBy(css = "[data-test='eco-badge']")
+    public List<WebElement> ecoBadges;
+
+    @FindBy(css = "[data-test='compare-btn']")
+    public List<WebElement> compareButtons;
+
+    @FindBy(css = "[data-test='comparison-bar']")
+    public WebElement comparisonBar;
+
+    @FindBy(css = "[data-test='compare-link']")
+    public WebElement compareLink;
+
+    @FindBy(css = "[data-test='clear-comparison']")
+    public WebElement clearComparison;
+
+    @FindBy(css = "[role='slider'][aria-label='ngx-slider-max']")
+    public WebElement priceMaxSlider;
+
     /** Last resort: product cards have no shared test id. */
-    private static final By CARDS = By.cssSelector("a.card");
+    @FindBy(css = "a.card")
+    private List<WebElement> cards;
 
     public HomePage(WebDriver driver) {
         super(driver);
@@ -37,12 +78,12 @@ public class HomePage extends BasePage {
 
     public void openAndWaitForProducts() {
         open();
-        waitVisible(PRODUCT_NAMES);
+        waitVisible(productName);
     }
 
     public void search(String term) {
-        type(SEARCH_INPUT, term);
-        click(SEARCH_SUBMIT);
+        type(searchInput, term);
+        click(searchSubmit);
         waitFor("search_completed");
     }
 
@@ -52,16 +93,16 @@ public class HomePage extends BasePage {
     }
 
     public void sortBy(String value) {
-        selectValue(SORT, value);
+        selectValue(sort, value);
         waitFor("sorting_completed");
     }
 
     public List<String> listedNames() {
-        return texts(PRODUCT_NAMES);
+        return texts(productNames);
     }
 
     public List<Double> prices() {
-        return texts(PRODUCT_PRICES).stream().map(t -> Double.parseDouble(t.replaceAll("[^0-9.]", ""))).toList();
+        return texts(productPrices).stream().map(t -> Double.parseDouble(t.replaceAll("[^0-9.]", ""))).toList();
     }
 
     /** Sidebar checkbox for a category or brand, found by its visible label. */
@@ -75,28 +116,28 @@ public class HomePage extends BasePage {
 
     /** Opens the first in-stock card and returns its name. */
     public String openFirstInStockProduct() {
-        WebElement card = wait.until(d -> d.findElements(CARDS).stream()
-                .filter(c -> c.findElements(testId("out-of-stock")).isEmpty())
+        WebElement card = wait.until(d -> cards.stream()
+                .filter(c -> c.findElements(CARD_OUT_OF_STOCK).isEmpty())
                 .findFirst().orElse(null));
-        String name = card.findElement(PRODUCT_NAMES).getText().trim();
+        String name = card.findElement(CARD_NAME).getText().trim();
         card.click();
         return name;
     }
 
     public void lowerMaxPrice() {
         wait.until(d -> {
-            d.findElement(PRICE_MAX_SLIDER).sendKeys(Keys.PAGE_DOWN);
+            priceMaxSlider.sendKeys(Keys.PAGE_DOWN);
             return true;
         });
     }
 
     public int maxPrice() {
-        return Integer.parseInt(attribute(PRICE_MAX_SLIDER, "aria-valuenow"));
+        return Integer.parseInt(attribute(priceMaxSlider, "aria-valuenow"));
     }
 
     public void compareProduct(int index) {
         wait.until(d -> {
-            d.findElements(COMPARE_BUTTONS).get(index).click();
+            compareButtons.get(index).click();
             return true;
         });
     }

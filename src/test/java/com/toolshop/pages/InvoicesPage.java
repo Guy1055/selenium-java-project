@@ -1,13 +1,26 @@
 package com.toolshop.pages;
 
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+
+import java.util.List;
 
 public class InvoicesPage extends BasePage {
-    public static final By TITLE = testId("page-title");
-    public static final By ROWS = By.cssSelector("tbody tr");
-    public static final By INVOICE_NUMBER = testId("invoice-number");
-    public static final By DOWNLOAD = testId("download-invoice");
+    @FindBy(css = "[data-test='page-title']")
+    public WebElement title;
+
+    @FindBy(css = "tbody tr")
+    public WebElement row;
+
+    @FindBy(css = "tbody tr")
+    public List<WebElement> rows;
+
+    @FindBy(css = "[data-test='invoice-number']")
+    public WebElement invoiceNumber;
+
+    @FindBy(css = "[data-test='download-invoice']")
+    public WebElement download;
 
     public InvoicesPage(WebDriver driver) {
         super(driver);

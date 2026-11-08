@@ -74,9 +74,9 @@ public class AdminCatalogTest extends BaseUiTest {
         String name = brand.jsonPath().getString("name");
         AdminFormPage form = new AdminFormPage(driver());
         form.open("/admin/brands/edit/" + id);
-        expect().value(AdminFormPage.NAME, name);
+        expect().value(form.name, name);
 
-        form.type(AdminFormPage.NAME, name + " Renamed");
+        form.type(form.name, name + " Renamed");
         form.submit("brand");
 
         expect().visible(BRAND_SAVED);
@@ -129,7 +129,7 @@ public class AdminCatalogTest extends BaseUiTest {
         form.fillBrandOrCategory(name, "qa-category-" + id);
         form.submit("category");
 
-        expect().visible(AdminFormPage.SUCCESS);
+        expect().visible(form.success);
     }
 
     @Test(description = "ADM-21: an admin can rename a category")
@@ -139,12 +139,12 @@ public class AdminCatalogTest extends BaseUiTest {
         String name = category.jsonPath().getString("name");
         AdminFormPage form = new AdminFormPage(driver());
         form.open("/admin/categories/edit/" + category.jsonPath().getString("id"));
-        expect().value(AdminFormPage.NAME, name);
+        expect().value(form.name, name);
 
-        form.type(AdminFormPage.NAME, name + " Renamed");
+        form.type(form.name, name + " Renamed");
         form.submit("category");
 
-        expect().visible(AdminFormPage.SUCCESS);
+        expect().visible(form.success);
     }
 
     @Test(description = "ADM-22: an admin can find and delete a category")
@@ -199,7 +199,7 @@ public class AdminCatalogTest extends BaseUiTest {
         form.fillProduct(formFor(name, "9.99"));
         form.submit("product");
 
-        expect().visible(AdminFormPage.SUCCESS);
+        expect().visible(form.success);
     }
 
     @Test(description = "ADM-31: an admin can change a product price")
@@ -210,13 +210,13 @@ public class AdminCatalogTest extends BaseUiTest {
         String name = product.jsonPath().getString("name");
         AdminFormPage form = new AdminFormPage(driver());
         form.open("/admin/products/edit/" + id);
-        expect().value(AdminFormPage.NAME, name);
+        expect().value(form.name, name);
 
         // The edit form does not prefill stock, brand, category or image (BUG-03), so set them again.
         form.fillProduct(formFor(name, "19.5"));
         form.submit("product");
 
-        expect().visible(AdminFormPage.SUCCESS);
+        expect().visible(form.success);
         Assert.assertEquals(api.get("/products/" + id).jsonPath().getDouble("price"), 19.5, 0.001);
     }
 
@@ -240,12 +240,12 @@ public class AdminCatalogTest extends BaseUiTest {
         signInAsAdmin();
         AdminListPage list = new AdminListPage(driver(), "product", "/admin/products");
         list.open();
-        int fullCount = list.count(AdminListPage.ROWS);
+        int fullCount = list.count(list.rows);
 
         list.search("zzzz-no-such-product");
-        expect().count(AdminListPage.ROWS, 0);
+        expect().count(list.rows, 0);
         list.click(list.resetButton());
 
-        expect().count(AdminListPage.ROWS, fullCount);
+        expect().count(list.rows, fullCount);
     }
 }

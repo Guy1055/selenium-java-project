@@ -27,6 +27,7 @@ public class AuthTest extends BaseUiTest {
 
     @Test(description = "AUTH-02: a registered user can log in and sees the account page", groups = "sanity")
     public void login() {
+        NavBar nav = new NavBar(driver());
         Customer customer = newCustomer();
         LoginPage login = new LoginPage(driver());
         login.open();
@@ -34,7 +35,7 @@ public class AuthTest extends BaseUiTest {
         login.login(customer.user().email(), customer.user().password());
 
         expect().url("/account");
-        expect().containsText(NavBar.USER_MENU, customer.user().firstName());
+        expect().containsText(nav.userMenu, customer.user().firstName());
     }
 
     @Test(description = "AUTH-03: a wrong password shows an error")
@@ -45,7 +46,7 @@ public class AuthTest extends BaseUiTest {
 
         login.login(customer.user().email(), WRONG_PASSWORD);
 
-        expect().containsText(LoginPage.ERROR, "Invalid email or password");
+        expect().containsText(login.error, "Invalid email or password");
         expect().url("/auth/login");
     }
 
@@ -54,10 +55,10 @@ public class AuthTest extends BaseUiTest {
         LoginPage login = new LoginPage(driver());
         login.open();
 
-        login.click(LoginPage.SUBMIT);
+        login.click(login.submit);
 
-        expect().containsText(LoginPage.EMAIL_ERROR, "Email is required");
-        expect().containsText(LoginPage.PASSWORD_ERROR, "Password is required");
+        expect().containsText(login.emailError, "Email is required");
+        expect().containsText(login.passwordError, "Password is required");
     }
 
     @Test(description = "AUTH-10: repeated failures lock the account")
@@ -70,7 +71,7 @@ public class AuthTest extends BaseUiTest {
 
         expect().condition("the account to lock", () -> {
             login.login(customer.user().email(), WRONG_PASSWORD);
-            return driver.findElements(LoginPage.ERROR).stream().anyMatch(e -> e.getText().contains("locked"));
+            return login.errors.stream().anyMatch(e -> e.getText().contains("locked"));
         });
     }
 
@@ -79,12 +80,12 @@ public class AuthTest extends BaseUiTest {
         signedInCustomer();
         NavBar nav = new NavBar(driver());
         open("/account");
-        expect().containsText(NavBar.USER_MENU, "Test");
+        expect().containsText(nav.userMenu, "Test");
 
         nav.logOut();
 
         expect().url("/auth/login");
-        expect().visible(NavBar.SIGN_IN);
+        expect().visible(nav.signIn);
     }
 
     @DataProvider
@@ -139,7 +140,7 @@ public class AuthTest extends BaseUiTest {
 
         register.register(TestData.newUser().withEmail(customer.user().email()));
 
-        expect().containsText(RegisterPage.ERROR, "already exists");
+        expect().containsText(register.error, "already exists");
     }
 
     @Test(description = "AUTH-12: an empty form shows every required message")
@@ -147,7 +148,7 @@ public class AuthTest extends BaseUiTest {
         RegisterPage register = new RegisterPage(driver());
         register.open();
 
-        register.click(RegisterPage.SUBMIT);
+        register.click(register.submit);
 
         for (String field : new String[]{"first-name", "last-name", "dob", "country", "postal_code", "house_number",
                 "street", "city", "state", "phone", "email", "password"}) {
@@ -160,9 +161,9 @@ public class AuthTest extends BaseUiTest {
         ForgotPasswordPage forgot = new ForgotPasswordPage(driver());
         forgot.open();
 
-        forgot.click(ForgotPasswordPage.SUBMIT);
+        forgot.click(forgot.submit);
 
-        expect().containsText(ForgotPasswordPage.EMAIL_ERROR, "Email is required");
+        expect().containsText(forgot.emailError, "Email is required");
     }
 
     @Test(description = "AUTH-13: a registered email gets a confirmation")
@@ -172,9 +173,9 @@ public class AuthTest extends BaseUiTest {
         ForgotPasswordPage forgot = new ForgotPasswordPage(driver());
         forgot.open();
 
-        forgot.type(ForgotPasswordPage.EMAIL, customer.user().email());
-        forgot.click(ForgotPasswordPage.SUBMIT);
+        forgot.type(forgot.email, customer.user().email());
+        forgot.click(forgot.submit);
 
-        expect().visible(ForgotPasswordPage.CONFIRMATION);
+        expect().visible(forgot.confirmation);
     }
 }

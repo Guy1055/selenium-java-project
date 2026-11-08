@@ -35,9 +35,9 @@ public class ContactTest extends BaseUiTest {
         ContactPage contact = openAsGuest();
         contact.fillMessage(subject, TestData.CONTACT_MESSAGE);
 
-        contact.click(ContactPage.SUBMIT);
+        contact.click(contact.submit);
 
-        expect().visible(ContactPage.CONFIRMATION);
+        expect().visible(contact.confirmation);
     }
 
     @Test(description = "CON-02: an empty form shows every required message")
@@ -45,7 +45,7 @@ public class ContactTest extends BaseUiTest {
         ContactPage contact = new ContactPage(driver());
         contact.open();
 
-        contact.click(ContactPage.SUBMIT);
+        contact.click(contact.submit);
 
         expect().containsText(ContactPage.error("first-name"), "First name is required");
         expect().containsText(ContactPage.error("last-name"), "Last name is required");
@@ -59,10 +59,10 @@ public class ContactTest extends BaseUiTest {
         ContactPage contact = openAsGuest();
         contact.fillMessage("webmaster", "Too short.");
 
-        contact.click(ContactPage.SUBMIT);
+        contact.click(contact.submit);
 
         expect().containsText(ContactPage.error("message"), "minimal 50");
-        expect().hidden(ContactPage.CONFIRMATION);
+        expect().hidden(contact.confirmation);
     }
 
     @Test(description = "CON-04: an invalid email is rejected")
@@ -72,10 +72,10 @@ public class ContactTest extends BaseUiTest {
         contact.fillGuest("Test", "User", "not-an-email");
         contact.fillMessage("webmaster", TestData.CONTACT_MESSAGE);
 
-        contact.click(ContactPage.SUBMIT);
+        contact.click(contact.submit);
 
         expect().visible(ContactPage.error("email"));
-        expect().hidden(ContactPage.CONFIRMATION);
+        expect().hidden(contact.confirmation);
     }
 
     @DataProvider
@@ -89,7 +89,7 @@ public class ContactTest extends BaseUiTest {
         contact.open();
 
         contact.attach(tempFile(suffix, content));
-        contact.click(ContactPage.SUBMIT);
+        contact.click(contact.submit);
 
         expect().visible(ContactPage.error("attachment"));
     }
@@ -100,9 +100,9 @@ public class ContactTest extends BaseUiTest {
         contact.fillMessage("webmaster", TestData.CONTACT_MESSAGE);
         contact.attach(tempFile(".txt", ""));
 
-        contact.click(ContactPage.SUBMIT);
+        contact.click(contact.submit);
 
-        expect().visible(ContactPage.CONFIRMATION);
+        expect().visible(contact.confirmation);
     }
 
     @Test(description = "CON-07: a logged-in customer does not retype name and email")
@@ -111,11 +111,11 @@ public class ContactTest extends BaseUiTest {
         ContactPage contact = new ContactPage(driver());
         contact.open();
 
-        expect().hidden(ContactPage.FIRST_NAME);
-        expect().hidden(ContactPage.EMAIL);
+        expect().hidden(contact.firstName);
+        expect().hidden(contact.email);
         contact.fillMessage("customer-service", TestData.CONTACT_MESSAGE);
-        contact.click(ContactPage.SUBMIT);
+        contact.click(contact.submit);
 
-        expect().visible(ContactPage.CONFIRMATION);
+        expect().visible(contact.confirmation);
     }
 }

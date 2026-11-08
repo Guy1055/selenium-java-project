@@ -34,43 +34,52 @@ public final class Expect {
         }
     }
 
-    private WebElement element(By by) {
-        return driver.findElement(by);
-    }
-
     public void visible(By by) {
-        that(by + " to be visible", () -> element(by).isDisplayed());
+        that(by + " to be visible", () -> driver.findElement(by).isDisplayed());
     }
 
-    public void hidden(By by) {
-        that(by + " to be hidden", () -> driver.findElements(by).stream().noneMatch(WebElement::isDisplayed));
+    public void visible(WebElement element) {
+        that(element + " to be visible", element::isDisplayed);
     }
 
-    public void attached(By by) {
-        that(by + " to be attached", () -> !driver.findElements(by).isEmpty());
+    public void hidden(WebElement element) {
+        that(element + " to be hidden", () -> {
+            try {
+                return !element.isDisplayed();
+            } catch (NoSuchElementException e) {
+                return true;
+            }
+        });
     }
 
     public void text(By by, String expected) {
-        that(by + " to have text '" + expected + "', was '" + safeText(by) + "'",
-                () -> element(by).getText().trim().equals(expected));
+        that(by + " to have text '" + expected + "'", () -> driver.findElement(by).getText().trim().equals(expected));
+    }
+
+    public void text(WebElement element, String expected) {
+        that(element + " to have text '" + expected + "', was '" + safeText(element) + "'",
+                () -> element.getText().trim().equals(expected));
     }
 
     public void containsText(By by, String expected) {
-        that(by + " to contain '" + expected + "', was '" + safeText(by) + "'",
-                () -> element(by).getText().contains(expected));
+        that(by + " to contain '" + expected + "'", () -> driver.findElement(by).getText().contains(expected));
     }
 
-    public void value(By by, String expected) {
-        that(by + " to have value '" + expected + "'", () -> expected.equals(element(by).getDomProperty("value")));
+    public void containsText(WebElement element, String expected) {
+        that(element + " to contain '" + expected + "', was '" + safeText(element) + "'",
+                () -> element.getText().contains(expected));
     }
 
-    public void count(By by, int expected) {
-        that(by + " count to be " + expected + ", was " + driver.findElements(by).size(),
-                () -> driver.findElements(by).size() == expected);
+    public void value(WebElement element, String expected) {
+        that(element + " to have value '" + expected + "'", () -> expected.equals(element.getDomProperty("value")));
     }
 
-    public void disabled(By by) {
-        that(by + " to be disabled", () -> !element(by).isEnabled());
+    public void count(List<WebElement> elements, int expected) {
+        that("element count to be " + expected + ", was " + elements.size(), () -> elements.size() == expected);
+    }
+
+    public void disabled(WebElement element) {
+        that(element + " to be disabled", () -> !element.isEnabled());
     }
 
     public void url(String regex) {
@@ -89,17 +98,15 @@ public final class Expect {
         that(description, condition);
     }
 
-    public void texts(By by, List<String> expected) {
-        that(by + " to list " + expected, () -> driver.findElements(by).stream()
-                .map(e -> e.getText().trim()).toList().equals(expected));
+    public void texts(List<WebElement> elements, List<String> expected) {
+        that("elements to list " + expected, () -> elements.stream().map(e -> e.getText().trim()).toList().equals(expected));
     }
 
-    private String safeText(By by) {
+    private String safeText(WebElement element) {
         try {
-            List<WebElement> found = driver.findElements(by);
-            return found.isEmpty() ? "<absent>" : found.get(0).getText();
+            return element.getText();
         } catch (RuntimeException e) {
-            return "<unreadable>";
+            return "<absent>";
         }
     }
 }

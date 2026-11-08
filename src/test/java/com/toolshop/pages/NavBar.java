@@ -1,43 +1,59 @@
 package com.toolshop.pages;
 
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.FindBy;
 
 public class NavBar extends BasePage {
-    public static final By HOME = testId("nav-home");
-    public static final By CATEGORIES = testId("nav-categories");
-    public static final By CONTACT = testId("nav-contact");
-    public static final By SIGN_IN = testId("nav-sign-in");
-    public static final By USER_MENU = testId("nav-menu");
-    public static final By SIGN_OUT = testId("nav-sign-out");
-    public static final By CART = testId("nav-cart");
-    private static final By REPORTS = By.id("reportsDropdown");
+    @FindBy(css = "[data-test='nav-home']")
+    public WebElement home;
+
+    @FindBy(css = "[data-test='nav-categories']")
+    public WebElement categories;
+
+    @FindBy(css = "[data-test='nav-contact']")
+    public WebElement contact;
+
+    @FindBy(css = "[data-test='nav-sign-in']")
+    public WebElement signIn;
+
+    @FindBy(css = "[data-test='nav-menu']")
+    public WebElement userMenu;
+
+    @FindBy(css = "[data-test='nav-sign-out']")
+    public WebElement signOut;
+
+    @FindBy(css = "[data-test='nav-cart']")
+    public WebElement cart;
+
+    @FindBy(id = "reportsDropdown")
+    private WebElement reports;
 
     public NavBar(WebDriver driver) {
         super(driver);
     }
 
     public void openCategory(String id) {
-        click(CATEGORIES);
+        click(categories);
         click(testId(id));
     }
 
     public void logOut() {
-        click(USER_MENU);
-        click(SIGN_OUT);
+        click(userMenu);
+        click(signOut);
     }
 
     public void openUserMenuItem(String id) {
-        click(USER_MENU);
+        click(userMenu);
         click(testId(id));
     }
 
     /** Report links live in a nested menu that opens on hover; clicking it closes the parent. */
     public void openReport(String id) {
-        click(USER_MENU);
-        waitVisible(REPORTS);
-        new Actions(driver).moveToElement(driver.findElement(REPORTS)).perform();
+        click(userMenu);
+        waitVisible(reports);
+        new Actions(driver).moveToElement(reports).perform();
         click(testId(id));
     }
 }

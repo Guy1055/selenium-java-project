@@ -10,7 +10,7 @@ https://practicesoftwaretesting.com (Toolshop, a public demo app built for test 
 
 ## Conventions
 - Java 21, Maven Wrapper, Selenium 4, TestNG, REST Assured.
-- Page Object Model under `pages/`; locators are `By` constants using `data-test` through `BasePage.testId`.
+- Page Object Model under `pages/` with PageFactory: elements are `@FindBy` fields on `data-test`, never `@CacheLookup`. Use `By` (`BasePage.testId`) only for locators built at run time or searched inside another element.
 - No `Thread.sleep`. Page objects auto-wait; assertions go through `Expect`.
 - Known site defects use `@KnownBug` with a BUG id from the Playwright project's TEST-PLAN.md.
 - A new scenario goes into both projects under the same id.

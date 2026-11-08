@@ -29,8 +29,8 @@ public class AdminOperationsTest extends BaseUiTest {
 
         list.search(number);
 
-        expect().count(AdminListPage.ROWS, 1);
-        expect().containsText(AdminListPage.ROWS, number);
+        expect().count(list.rows, 1);
+        expect().containsText(list.row, number);
     }
 
     @Test(description = "ADM-41: an admin can update the status of an order")
@@ -41,12 +41,12 @@ public class AdminOperationsTest extends BaseUiTest {
         signInAsAdmin();
         AdminOrderPage order = new AdminOrderPage(driver());
         order.open(id);
-        expect().value(AdminOrderPage.INVOICE_NUMBER, invoice.jsonPath().getString("invoice_number"));
+        expect().value(order.invoiceNumber, invoice.jsonPath().getString("invoice_number"));
 
-        order.selectValue(AdminOrderPage.STATUS, "SHIPPED");
-        order.click(AdminOrderPage.UPDATE_STATUS);
+        order.selectValue(order.status, "SHIPPED");
+        order.click(order.updateStatus);
 
-        expect().visible(AdminOrderPage.SUCCESS);
+        expect().visible(order.success);
         Assert.assertEquals(adminApi().get("/invoices/" + id).jsonPath().getString("status"), "SHIPPED");
     }
 
@@ -64,7 +64,7 @@ public class AdminOperationsTest extends BaseUiTest {
         form.fillUser("Test", "Admin Added", email, "Qa!" + TestData.uniqueId() + "xZ");
         form.submit("user");
 
-        expect().visible(AdminFormPage.SUCCESS);
+        expect().visible(form.success);
     }
 
     @Test(description = "ADM-51: an admin can edit a user")
@@ -73,12 +73,12 @@ public class AdminOperationsTest extends BaseUiTest {
         signInAsAdmin();
         AdminFormPage form = new AdminFormPage(driver());
         form.open("/admin/users/edit/" + customer.id());
-        expect().value(BasePage.testId("email"), customer.user().email());
+        expect().value(form.email, customer.user().email());
 
-        form.type(BasePage.testId("first-name"), "Edited");
+        form.type(form.firstName, "Edited");
         form.submit("user");
 
-        expect().visible(AdminFormPage.SUCCESS);
+        expect().visible(form.success);
         Assert.assertEquals(adminApi().get("/users/" + customer.id()).jsonPath().getString("first_name"), "Edited");
     }
 
@@ -91,7 +91,7 @@ public class AdminOperationsTest extends BaseUiTest {
         list.open();
 
         list.search(user.email());
-        expect().count(AdminListPage.ROWS, 1);
+        expect().count(list.rows, 1);
         list.click(list.deleteButton(id));
 
         expect().visible(BasePage.alertWith("deleted"));
@@ -106,8 +106,8 @@ public class AdminOperationsTest extends BaseUiTest {
         message.open(id, TestData.CONTACT_MESSAGE);
         String reply = "An admin answer from the automated QA suite, please ignore.";
 
-        message.type(AdminMessagePage.REPLY_BOX, reply);
-        message.click(AdminMessagePage.REPLY_SUBMIT);
+        message.type(message.replyBox, reply);
+        message.click(message.replySubmit);
 
         expect().visible(MessagesPage.textOnPage(reply));
     }
@@ -119,7 +119,7 @@ public class AdminOperationsTest extends BaseUiTest {
         AdminMessagePage message = new AdminMessagePage(driver());
         message.open(id, TestData.CONTACT_MESSAGE);
 
-        message.selectValue(AdminMessagePage.STATUS, "RESOLVED");
+        message.selectValue(message.status, "RESOLVED");
 
         expect().condition("the status to reach the API",
                 () -> "RESOLVED".equals(adminApi().get("/messages/" + id).jsonPath().getString("status")));

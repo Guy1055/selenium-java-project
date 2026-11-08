@@ -3,52 +3,100 @@ package com.toolshop.pages;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
 
 import java.util.Map;
 
 public class CheckoutPage extends BasePage {
-    public static final By PAYMENT_METHOD = testId("payment-method");
-    public static final By FINISH = testId("finish");
-    public static final By PAYMENT_SUCCESS = testId("payment-success-message");
-    public static final By ADDRESS_CONTINUE = testId("proceed-3");
-    public static final By GUEST_SUBMIT = testId("guest-submit");
-    private static final By GUEST_TAB = By.xpath("//a[@role='tab'][normalize-space(.)='Continue as Guest']");
+    @FindBy(css = "[data-test='payment-method']")
+    public WebElement paymentMethod;
+
+    @FindBy(css = "[data-test='finish']")
+    public WebElement finish;
+
+    @FindBy(css = "[data-test='payment-success-message']")
+    public WebElement paymentSuccess;
+
+    @FindBy(css = "[data-test='proceed-3']")
+    public WebElement addressContinue;
+
+    @FindBy(css = "[data-test='guest-submit']")
+    public WebElement guestSubmit;
+
+    @FindBy(xpath = "//a[@role='tab'][normalize-space(.)='Continue as Guest']")
+    private WebElement guestTab;
+
+    @FindBy(css = "[data-test='proceed-1']")
+    private WebElement proceedFromCart;
+
+    @FindBy(css = "[data-test='proceed-2']")
+    private WebElement proceedFromSignIn;
+
+    @FindBy(css = "[data-test='proceed-2-guest']")
+    private WebElement proceedAsGuest;
+
+    @FindBy(css = "[data-test='street']")
+    private WebElement street;
+
+    @FindBy(css = "[data-test='city']")
+    private WebElement city;
+
+    @FindBy(css = "[data-test='state']")
+    private WebElement state;
+
+    @FindBy(css = "[data-test='country']")
+    private WebElement country;
+
+    @FindBy(css = "[data-test='house_number']")
+    private WebElement houseNumber;
+
+    @FindBy(css = "[data-test='postal_code']")
+    private WebElement postalCode;
+
+    @FindBy(css = "[data-test='guest-email']")
+    private WebElement guestEmail;
+
+    @FindBy(css = "[data-test='guest-first-name']")
+    private WebElement guestFirstName;
+
+    @FindBy(css = "[data-test='guest-last-name']")
+    private WebElement guestLastName;
 
     public CheckoutPage(WebDriver driver) {
         super(driver);
     }
 
     public void proceedFromCart() {
-        click(testId("proceed-1"));
+        click(proceedFromCart);
     }
 
     /** Step 2 when already logged in. */
     public void proceedFromSignIn() {
-        click(testId("proceed-2"));
+        click(proceedFromSignIn);
     }
 
     public void fillAddressAndContinue() {
-        type(testId("street"), "Test Street");
-        type(testId("city"), "Amsterdam");
-        type(testId("state"), "Noord-Holland");
-        selectValue(testId("country"), "NL");
-        type(testId("house_number"), "42");
-        type(testId("postal_code"), "1011AB");
-        click(ADDRESS_CONTINUE);
+        type(street, "Test Street");
+        type(city, "Amsterdam");
+        type(state, "Noord-Holland");
+        selectValue(country, "NL");
+        type(houseNumber, "42");
+        type(postalCode, "1011AB");
+        click(addressContinue);
     }
 
     public void openGuestTab() {
-        click(GUEST_TAB);
+        click(guestTab);
     }
 
     public void continueAsGuest(String email, String firstName, String lastName) {
         openGuestTab();
-        type(testId("guest-email"), email);
-        type(testId("guest-first-name"), firstName);
-        type(testId("guest-last-name"), lastName);
-        click(GUEST_SUBMIT);
-        click(testId("proceed-2-guest"));
+        type(guestEmail, email);
+        type(guestFirstName, firstName);
+        type(guestLastName, lastName);
+        click(guestSubmit);
+        click(proceedAsGuest);
     }
 
     public static By guestError(String field) {
@@ -70,8 +118,8 @@ public class CheckoutPage extends BasePage {
     }
 
     public void pay(String method, Map<String, String> fields) {
-        selectValue(PAYMENT_METHOD, method);
+        selectValue(paymentMethod, method);
         fillPaymentDetails(fields);
-        click(FINISH);
+        click(finish);
     }
 }

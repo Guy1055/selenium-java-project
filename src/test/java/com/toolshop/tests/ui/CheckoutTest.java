@@ -41,7 +41,7 @@ public class CheckoutTest extends BaseUiTest {
 
         checkout.pay("cash-on-delivery", Map.of());
 
-        expect().visible(CheckoutPage.PAYMENT_SUCCESS);
+        expect().visible(checkout.paymentSuccess);
     }
 
     @Test(description = "CHK-02: a guest can complete an order")
@@ -52,7 +52,7 @@ public class CheckoutTest extends BaseUiTest {
         checkout.fillAddressAndContinue();
         checkout.pay("cash-on-delivery", Map.of());
 
-        expect().visible(CheckoutPage.PAYMENT_SUCCESS);
+        expect().visible(checkout.paymentSuccess);
     }
 
     @Test(description = "CHK-03: the address step cannot continue while required fields are empty")
@@ -61,7 +61,7 @@ public class CheckoutTest extends BaseUiTest {
 
         checkout.continueAsGuest("qa.guest@example.com", "Test", "Guest");
 
-        expect().disabled(CheckoutPage.ADDRESS_CONTINUE);
+        expect().disabled(checkout.addressContinue);
     }
 
     @Test(description = "CHK-06: guest details are validated")
@@ -69,7 +69,7 @@ public class CheckoutTest extends BaseUiTest {
         CheckoutPage checkout = reachSignInStep();
         checkout.openGuestTab();
 
-        checkout.click(CheckoutPage.GUEST_SUBMIT);
+        checkout.click(checkout.guestSubmit);
 
         expect().visible(CheckoutPage.guestError("email"));
         expect().visible(CheckoutPage.guestError("first-name"));
@@ -94,7 +94,7 @@ public class CheckoutTest extends BaseUiTest {
 
         checkout.pay(method, details);
 
-        expect().visible(CheckoutPage.PAYMENT_SUCCESS);
+        expect().visible(checkout.paymentSuccess);
     }
 
     @DataProvider
@@ -111,9 +111,9 @@ public class CheckoutTest extends BaseUiTest {
     public void invalidPayment(String method, Map<String, String> details) {
         CheckoutPage checkout = reachPaymentStepAsCustomer();
 
-        checkout.selectValue(CheckoutPage.PAYMENT_METHOD, method);
+        checkout.selectValue(checkout.paymentMethod, method);
         checkout.fillPaymentDetails(details);
 
-        expect().disabled(CheckoutPage.FINISH);
+        expect().disabled(checkout.finish);
     }
 }

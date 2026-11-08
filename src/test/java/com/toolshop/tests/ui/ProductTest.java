@@ -14,29 +14,30 @@ import java.util.List;
 public class ProductTest extends BaseUiTest {
     @Test(description = "PRD-01: product page shows name, price and description", groups = "sanity")
     public void showsDetails() {
+        ProductPage product = new ProductPage(driver());
         HomePage home = new HomePage(driver());
         home.openAndWaitForProducts();
 
         String name = home.openFirstInStockProduct();
 
-        expect().text(ProductPage.NAME, name);
+        expect().text(product.name, name);
         expect().condition("price to be formatted",
-                () -> driver().findElement(ProductPage.UNIT_PRICE).getText().matches(".*\\d+\\.\\d{2}.*"));
-        expect().visible(ProductPage.DESCRIPTION);
+                () -> product.unitPrice.getText().matches(".*\\d+\\.\\d{2}.*"));
+        expect().visible(product.description);
     }
 
     @Test(description = "PRD-02: quantity buttons change the value and stop at 1")
     public void quantityButtons() {
         ProductPage product = new ProductPage(driver());
         product.open(api.inStockProduct().id());
-        expect().value(ProductPage.QUANTITY, "1");
+        expect().value(product.quantity, "1");
 
-        product.click(ProductPage.INCREASE);
-        expect().value(ProductPage.QUANTITY, "2");
-        product.click(ProductPage.DECREASE);
-        expect().value(ProductPage.QUANTITY, "1");
-        product.click(ProductPage.DECREASE);
-        expect().value(ProductPage.QUANTITY, "1");
+        product.click(product.increase);
+        expect().value(product.quantity, "2");
+        product.click(product.decrease);
+        expect().value(product.quantity, "1");
+        product.click(product.decrease);
+        expect().value(product.quantity, "1");
     }
 
     @Test(description = "PRD-03: the chosen quantity is added to the cart")
@@ -44,10 +45,10 @@ public class ProductTest extends BaseUiTest {
         ProductPage product = new ProductPage(driver());
         product.open(api.inStockProduct().id());
 
-        product.type(ProductPage.QUANTITY, "3");
+        product.type(product.quantity, "3");
         product.addToCart();
 
-        expect().text(ProductPage.CART_BADGE, "3");
+        expect().text(product.cartBadge, "3");
     }
 
     @Test(description = "PRD-04: related products are shown and open")
@@ -55,14 +56,14 @@ public class ProductTest extends BaseUiTest {
         ToolshopApi.Product sample = api.inStockProduct();
         ProductPage product = new ProductPage(driver());
         product.open(sample.id());
-        expect().text(ProductPage.NAME, sample.name());
-        expect().visible(ProductPage.RELATED);
+        expect().text(product.name, sample.name());
+        expect().visible(product.related);
 
-        product.click(ProductPage.RELATED);
+        product.click(product.related);
 
         expect().urlNot(sample.id());
         expect().condition("the product name to change",
-                () -> !product.text(ProductPage.NAME).equals(sample.name()));
+                () -> !product.text(product.name).equals(sample.name()));
     }
 
     @Test(description = "PRD-05: specifications match the API")
@@ -73,9 +74,10 @@ public class ProductTest extends BaseUiTest {
             throw new SkipException("This product has no specifications");
         }
 
-        new ProductPage(driver()).open(id);
+        ProductPage product = new ProductPage(driver());
+        product.open(id);
 
-        expect().count(ProductPage.SPEC_ROWS, specs.size());
+        expect().count(product.specRows, specs.size());
     }
 
     @Test(description = "PRD-06: a guest cannot add a favorite")
@@ -83,7 +85,7 @@ public class ProductTest extends BaseUiTest {
         ProductPage product = new ProductPage(driver());
         product.open(api.inStockProduct().id());
 
-        product.click(ProductPage.ADD_TO_FAVORITES);
+        product.click(product.addToFavorites);
 
         expect().visible(BasePage.alertWith("Unauthorized"));
     }
@@ -94,10 +96,10 @@ public class ProductTest extends BaseUiTest {
         ProductPage product = new ProductPage(driver());
         product.open(api.inStockProduct().id());
 
-        product.click(ProductPage.ADD_TO_FAVORITES);
+        product.click(product.addToFavorites);
         expect().visible(BasePage.alertWith("added to your favorites"));
 
-        product.click(ProductPage.ADD_TO_FAVORITES);
+        product.click(product.addToFavorites);
         expect().visible(BasePage.alertWith("already"));
     }
 
@@ -106,45 +108,48 @@ public class ProductTest extends BaseUiTest {
         home.openAndWaitForProducts();
         home.compareProduct(0);
         home.compareProduct(1);
-        expect().containsText(HomePage.COMPARISON_BAR, "2 product(s) selected");
+        expect().containsText(home.comparisonBar, "2 product(s) selected");
         return home;
     }
 
     @Test(description = "CMP-01: two selected products appear side by side")
     public void compareTwo() {
+        ComparisonPage comparison = new ComparisonPage(driver());
         HomePage home = selectTwoProducts();
 
-        home.click(HomePage.COMPARE_LINK);
+        home.click(home.compareLink);
 
         expect().url("/comparison$");
-        expect().count(ComparisonPage.REMOVE_BUTTONS, 2);
-        expect().containsText(ComparisonPage.TABLE, "Price");
+        expect().count(comparison.removeButtons, 2);
+        expect().containsText(comparison.table, "Price");
     }
 
     @Test(description = "CMP-02: removing a product updates the comparison")
     public void compareRemove() {
+        ComparisonPage comparison = new ComparisonPage(driver());
         HomePage home = selectTwoProducts();
-        home.click(HomePage.COMPARE_LINK);
-        expect().count(ComparisonPage.REMOVE_BUTTONS, 2);
+        home.click(home.compareLink);
+        expect().count(comparison.removeButtons, 2);
 
-        home.click(ComparisonPage.REMOVE_BUTTONS);
+        home.click(comparison.removeButton);
 
-        expect().count(ComparisonPage.REMOVE_BUTTONS, 1);
+        expect().count(comparison.removeButtons, 1);
     }
 
     @Test(description = "CMP-03: clear all removes the comparison bar")
     public void compareClear() {
         HomePage home = selectTwoProducts();
 
-        home.click(HomePage.CLEAR_COMPARISON);
+        home.click(home.clearComparison);
 
-        expect().hidden(HomePage.COMPARISON_BAR);
+        expect().hidden(home.comparisonBar);
     }
 
     @Test(description = "CMP-04: the comparison page explains when it is empty")
     public void compareEmpty() {
-        new ComparisonPage(driver()).open();
+        ComparisonPage comparison = new ComparisonPage(driver());
+        comparison.open();
 
-        expect().visible(ComparisonPage.EMPTY);
+        expect().visible(comparison.empty);
     }
 }

@@ -3,10 +3,19 @@ package com.toolshop.pages.admin;
 import com.toolshop.pages.BasePage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+
+import java.util.List;
 
 /** Admin list screens share one layout: title, search form, table, row actions. */
 public class AdminListPage extends BasePage {
-    public static final By ROWS = By.cssSelector("tbody tr");
+    @FindBy(css = "tbody tr")
+    public WebElement row;
+
+    @FindBy(css = "tbody tr")
+    public List<WebElement> rows;
+
     private final String entity;
     private final String path;
 
@@ -18,7 +27,7 @@ public class AdminListPage extends BasePage {
 
     public void open() {
         goTo(path);
-        waitVisible(ROWS);
+        waitVisible(row);
     }
 
     public By addButton() {

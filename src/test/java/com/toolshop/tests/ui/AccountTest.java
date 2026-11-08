@@ -31,29 +31,30 @@ public class AccountTest extends BaseUiTest {
         signedInCustomer();
         AccountPage account = new AccountPage(driver());
         account.open();
-        expect().text(AccountPage.TITLE, "My account");
+        expect().text(account.title, "My account");
 
         account.click(AccountPage.link(section));
 
         expect().url(path + "$");
-        expect().containsText(AccountPage.TITLE, title);
+        expect().containsText(account.title, title);
     }
 
     @Test(description = "ACC-02: the profile shows the registered details")
     public void profileDetails() {
         Customer customer = signedInCustomer();
 
-        new ProfilePage(driver()).open();
+        ProfilePage profile = new ProfilePage(driver());
+        profile.open();
 
-        expect().value(ProfilePage.FIRST_NAME, customer.user().firstName());
-        expect().value(ProfilePage.LAST_NAME, customer.user().lastName());
-        expect().value(ProfilePage.EMAIL, customer.user().email());
+        expect().value(profile.firstName, customer.user().firstName());
+        expect().value(profile.lastName, customer.user().lastName());
+        expect().value(profile.email, customer.user().email());
     }
 
     private ProfilePage openLoadedProfile(Customer customer) {
         ProfilePage profile = new ProfilePage(driver());
         profile.open();
-        expect().value(ProfilePage.FIRST_NAME, customer.user().firstName());
+        expect().value(profile.firstName, customer.user().firstName());
         return profile;
     }
 
@@ -62,10 +63,10 @@ public class AccountTest extends BaseUiTest {
         Customer customer = signedInCustomer();
         ProfilePage profile = openLoadedProfile(customer);
 
-        profile.type(ProfilePage.FIRST_NAME, "Renamed");
-        profile.click(ProfilePage.UPDATE_SUBMIT);
+        profile.type(profile.firstName, "Renamed");
+        profile.click(profile.updateSubmit);
 
-        expect().containsText(ProfilePage.SUCCESS, "successfully updated");
+        expect().containsText(profile.success, "successfully updated");
         Assert.assertEquals(customer.api().get("/users/me").jsonPath().getString("first_name"), "Renamed");
     }
 
@@ -77,7 +78,7 @@ public class AccountTest extends BaseUiTest {
 
         profile.changePassword(customer.user().password(), next);
 
-        expect().containsText(ProfilePage.SUCCESS, "successfully updated");
+        expect().containsText(profile.success, "successfully updated");
         ToolshopApi.expectStatus(api.post("/users/login", Map.of("email", customer.user().email(), "password", next)), 200);
     }
 
@@ -88,7 +89,7 @@ public class AccountTest extends BaseUiTest {
 
         profile.changePassword("Not!TheCurrent1", customer.user().password() + "N1");
 
-        expect().containsText(ProfilePage.FAILURE, "current password");
+        expect().containsText(profile.failure, "current password");
     }
 
     @Test(description = "ACC-06: a wrong two-factor code is rejected")
@@ -96,22 +97,23 @@ public class AccountTest extends BaseUiTest {
         signedInCustomer();
         ProfilePage profile = new ProfilePage(driver());
         profile.open();
-        expect().visible(ProfilePage.TOTP_SECRET);
+        expect().visible(profile.totpSecret);
 
-        profile.type(ProfilePage.TOTP_CODE, "000000");
-        profile.click(ProfilePage.TOTP_VERIFY);
+        profile.type(profile.totpCode, "000000");
+        profile.click(profile.totpVerify);
 
-        expect().visible(ProfilePage.TOTP_ERROR);
+        expect().visible(profile.totpError);
     }
 
     @Test(description = "ACC-07: a new customer has no favorites")
     public void noFavorites() {
         signedInCustomer();
 
-        new FavoritesPage(driver()).open();
+        FavoritesPage favorites = new FavoritesPage(driver());
+        favorites.open();
 
-        expect().containsText(FavoritesPage.TITLE, "Favorites");
-        expect().count(FavoritesPage.NAMES, 0);
+        expect().containsText(favorites.title, "Favorites");
+        expect().count(favorites.names, 0);
     }
 
     @Test(description = "ACC-08: a favorite can be listed and removed")
@@ -121,21 +123,22 @@ public class AccountTest extends BaseUiTest {
         ToolshopApi.expectStatus(customer.api().post("/favorites", Map.of("product_id", product.id())), 201);
         FavoritesPage favorites = new FavoritesPage(driver());
         favorites.open();
-        expect().text(FavoritesPage.NAMES, product.name());
+        expect().text(favorites.name, product.name());
 
-        favorites.click(FavoritesPage.DELETE);
+        favorites.click(favorites.delete);
 
-        expect().count(FavoritesPage.NAMES, 0);
+        expect().count(favorites.names, 0);
     }
 
     @Test(description = "ACC-09: a new customer has an empty invoice list")
     public void noInvoices() {
         signedInCustomer();
 
-        new InvoicesPage(driver()).open();
+        InvoicesPage invoices = new InvoicesPage(driver());
+        invoices.open();
 
-        expect().containsText(InvoicesPage.TITLE, "Invoices");
-        expect().count(InvoicesPage.ROWS, 0);
+        expect().containsText(invoices.title, "Invoices");
+        expect().count(invoices.rows, 0);
     }
 
     @Test(description = "ACC-10: an order appears in the list and opens its details")
@@ -146,13 +149,13 @@ public class AccountTest extends BaseUiTest {
         InvoicesPage invoices = new InvoicesPage(driver());
 
         invoices.open();
-        expect().count(InvoicesPage.ROWS, 1);
-        expect().containsText(InvoicesPage.ROWS, number);
+        expect().count(invoices.rows, 1);
+        expect().containsText(invoices.row, number);
 
         invoices.openDetails(invoice.jsonPath().getString("id"));
 
-        expect().value(InvoicesPage.INVOICE_NUMBER, number);
-        expect().visible(InvoicesPage.DOWNLOAD);
+        expect().value(invoices.invoiceNumber, number);
+        expect().visible(invoices.download);
     }
 
     @Test(description = "ACC-11: a sent message appears in the list")
@@ -160,10 +163,11 @@ public class AccountTest extends BaseUiTest {
         Customer customer = signedInCustomer();
         sendMessage(customer);
 
-        new MessagesPage(driver()).open();
+        MessagesPage messages = new MessagesPage(driver());
+        messages.open();
 
-        expect().count(MessagesPage.ROWS, 1);
-        expect().containsText(MessagesPage.ROWS, "webmaster");
+        expect().count(messages.rows, 1);
+        expect().containsText(messages.row, "webmaster");
     }
 
     @Test(description = "ACC-12: a customer can reply on the message page")
@@ -174,8 +178,8 @@ public class AccountTest extends BaseUiTest {
         messages.openDetails(id, TestData.CONTACT_MESSAGE);
         String text = "A follow-up from the automated QA suite, please ignore this reply.";
 
-        messages.type(MessagesPage.REPLY_BOX, text);
-        messages.click(MessagesPage.REPLY_SUBMIT);
+        messages.type(messages.replyBox, text);
+        messages.click(messages.replySubmit);
 
         expect().visible(MessagesPage.textOnPage(text));
     }

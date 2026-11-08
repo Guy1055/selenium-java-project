@@ -9,6 +9,7 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -16,7 +17,11 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import java.time.Duration;
 import java.util.List;
 
-/** Locator helpers and auto-waiting actions shared by every page object. No sleeps. */
+/**
+ * Auto-waiting actions shared by every page object. No sleeps.
+ * Elements are declared with @FindBy; each use looks the element up again, so Angular re-renders do not leave it stale.
+ * By is kept for locators built at run time.
+ */
 public abstract class BasePage {
     protected final WebDriver driver;
     protected final WebDriverWait wait;
@@ -28,6 +33,7 @@ public abstract class BasePage {
                 .ignoring(ElementClickInterceptedException.class)
                 .ignoring(ElementNotInteractableException.class)
                 .ignoring(NoSuchElementException.class);
+        PageFactory.initElements(driver, this);
     }
 
     /** This project's test id attribute is data-test. */
@@ -58,9 +64,22 @@ public abstract class BasePage {
         element.sendKeys(text);
     }
 
+    public void click(WebElement element) {
+        wait.until(d -> {
+            element.click();
+            return true;
+        });
+    }
+
+    public void type(WebElement element, String text) {
+        wait.until(ExpectedConditions.elementToBeClickable(element));
+        element.clear();
+        element.sendKeys(text);
+    }
+
     /** sendKeys on a native date input depends on the browser locale, so set the ISO value directly. */
-    public void setDate(By by, String isoDate) {
-        WebElement element = wait.until(ExpectedConditions.elementToBeClickable(by));
+    public void setDate(WebElement element, String isoDate) {
+        wait.until(ExpectedConditions.elementToBeClickable(element));
         ((JavascriptExecutor) driver).executeScript(
                 "arguments[0].value = arguments[1];"
                         + "arguments[0].dispatchEvent(new Event('input', {bubbles: true}));"
@@ -68,9 +87,9 @@ public abstract class BasePage {
                 element, isoDate);
     }
 
-    public void selectValue(By by, String value) {
+    public void selectValue(WebElement element, String value) {
         wait.until(d -> {
-            new Select(d.findElement(by)).selectByValue(value);
+            new Select(element).selectByValue(value);
             return true;
         });
     }
@@ -79,23 +98,27 @@ public abstract class BasePage {
         wait.until(ExpectedConditions.visibilityOfElementLocated(by));
     }
 
+    public void waitVisible(WebElement element) {
+        wait.until(ExpectedConditions.visibilityOf(element));
+    }
+
     public void waitAttached(By by) {
         wait.until(ExpectedConditions.presenceOfElementLocated(by));
     }
 
-    public String text(By by) {
-        return wait.until(d -> d.findElement(by).getText()).trim();
+    public String text(WebElement element) {
+        return wait.until(d -> element.getText()).trim();
     }
 
-    public String attribute(By by, String name) {
-        return wait.until(d -> d.findElement(by).getDomAttribute(name));
+    public String attribute(WebElement element, String name) {
+        return wait.until(d -> element.getDomAttribute(name));
     }
 
-    public List<String> texts(By by) {
-        return wait.until(d -> d.findElements(by).stream().map(e -> e.getText().trim()).toList());
+    public List<String> texts(List<WebElement> elements) {
+        return wait.until(d -> elements.stream().map(e -> e.getText().trim()).toList());
     }
 
-    public int count(By by) {
-        return driver.findElements(by).size();
+    public int count(List<WebElement> elements) {
+        return elements.size();
     }
 }

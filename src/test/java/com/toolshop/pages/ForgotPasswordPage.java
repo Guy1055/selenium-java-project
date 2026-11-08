@@ -1,13 +1,21 @@
 package com.toolshop.pages;
 
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
 
 public class ForgotPasswordPage extends BasePage {
-    public static final By EMAIL = testId("email");
-    public static final By SUBMIT = testId("forgot-password-submit");
-    public static final By EMAIL_ERROR = testId("email-error");
-    public static final By CONFIRMATION = By.cssSelector(".alert-success");
+    @FindBy(css = "[data-test='email']")
+    public WebElement email;
+
+    @FindBy(css = "[data-test='forgot-password-submit']")
+    public WebElement submit;
+
+    @FindBy(css = "[data-test='email-error']")
+    public WebElement emailError;
+
+    @FindBy(css = ".alert-success")
+    public WebElement confirmation;
 
     public ForgotPasswordPage(WebDriver driver) {
         super(driver);
@@ -15,6 +23,6 @@ public class ForgotPasswordPage extends BasePage {
 
     public void open() {
         goTo("/auth/forgot-password");
-        waitVisible(SUBMIT);
+        waitVisible(submit);
     }
 }

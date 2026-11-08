@@ -1,14 +1,22 @@
 package com.toolshop.pages.admin;
 
 import com.toolshop.pages.BasePage;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
 
 public class AdminOrderPage extends BasePage {
-    public static final By INVOICE_NUMBER = testId("invoice-number");
-    public static final By STATUS = testId("order-status");
-    public static final By UPDATE_STATUS = testId("update-status-submit");
-    public static final By SUCCESS = By.cssSelector(".alert-success");
+    @FindBy(css = "[data-test='invoice-number']")
+    public WebElement invoiceNumber;
+
+    @FindBy(css = "[data-test='order-status']")
+    public WebElement status;
+
+    @FindBy(css = "[data-test='update-status-submit']")
+    public WebElement updateStatus;
+
+    @FindBy(css = ".alert-success")
+    public WebElement success;
 
     public AdminOrderPage(WebDriver driver) {
         super(driver);

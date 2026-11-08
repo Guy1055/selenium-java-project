@@ -2,11 +2,23 @@ package com.toolshop.pages;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+
+import java.util.List;
 
 public class MessagesPage extends BasePage {
-    public static final By ROWS = By.cssSelector("tbody tr");
-    public static final By REPLY_BOX = testId("message");
-    public static final By REPLY_SUBMIT = testId("reply-submit");
+    @FindBy(css = "tbody tr")
+    public WebElement row;
+
+    @FindBy(css = "tbody tr")
+    public List<WebElement> rows;
+
+    @FindBy(css = "[data-test='message']")
+    public WebElement replyBox;
+
+    @FindBy(css = "[data-test='reply-submit']")
+    public WebElement replySubmit;
 
     public MessagesPage(WebDriver driver) {
         super(driver);

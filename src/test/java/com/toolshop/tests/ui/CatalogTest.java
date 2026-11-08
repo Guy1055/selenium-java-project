@@ -24,9 +24,9 @@ public class CatalogTest extends BaseUiTest {
 
         home.search("zzzz-no-such-product");
 
-        expect().text(HomePage.NO_RESULTS, "There are no products found.");
-        expect().count(HomePage.PRODUCT_NAMES, 0);
-        expect().containsText(HomePage.SEARCH_CAPTION, "zzzz-no-such-product");
+        expect().text(home.noResults, "There are no products found.");
+        expect().count(home.productNames, 0);
+        expect().containsText(home.searchCaption, "zzzz-no-such-product");
     }
 
     @DataProvider
@@ -41,7 +41,7 @@ public class CatalogTest extends BaseUiTest {
 
         home.search(term);
 
-        expect().visible(HomePage.PRODUCT_NAMES);
+        expect().visible(home.productName);
         expect().condition("every name to contain " + term,
                 () -> home.listedNames().stream().allMatch(n -> n.toLowerCase().contains(term)));
     }
@@ -52,13 +52,13 @@ public class CatalogTest extends BaseUiTest {
         home.openAndWaitForProducts();
         List<String> original = home.listedNames();
         home.search("hammer");
-        expect().visible(HomePage.SEARCH_CAPTION);
+        expect().visible(home.searchCaption);
 
-        home.click(HomePage.SEARCH_RESET);
+        home.click(home.searchReset);
 
-        expect().hidden(HomePage.SEARCH_CAPTION);
-        expect().value(HomePage.SEARCH_INPUT, "");
-        expect().texts(HomePage.PRODUCT_NAMES, original);
+        expect().hidden(home.searchCaption);
+        expect().value(home.searchInput, "");
+        expect().texts(home.productNames, original);
     }
 
     @DataProvider
@@ -76,7 +76,7 @@ public class CatalogTest extends BaseUiTest {
 
         home.sortBy(sort);
 
-        expect().texts(HomePage.PRODUCT_NAMES, expected);
+        expect().texts(home.productNames, expected);
     }
 
     @Test(description = "CAT-05: filtering by category narrows the list to that category")
@@ -92,7 +92,7 @@ public class CatalogTest extends BaseUiTest {
         home.filterBy(category);
         home.waitFor("filter_completed");
 
-        expect().texts(HomePage.PRODUCT_NAMES, expected);
+        expect().texts(home.productNames, expected);
     }
 
     @Test(description = "CAT-05b: filtering by brand lists only that brand")
@@ -107,7 +107,7 @@ public class CatalogTest extends BaseUiTest {
         home.filterBy(product.brandName());
         home.waitFor("filter_completed");
 
-        expect().texts(HomePage.PRODUCT_NAMES, expected);
+        expect().texts(home.productNames, expected);
     }
 
     @Test(description = "CAT-10: the eco filter shows only eco-friendly products")
@@ -115,11 +115,11 @@ public class CatalogTest extends BaseUiTest {
         HomePage home = new HomePage(driver());
         home.openAndWaitForProducts();
 
-        home.click(HomePage.ECO_FILTER);
+        home.click(home.ecoFilter);
 
         expect().condition("every listed product to have an eco badge", () -> {
-            int names = home.count(HomePage.PRODUCT_NAMES);
-            return names > 0 && home.count(HomePage.ECO_BADGES) == names;
+            int names = home.count(home.productNames);
+            return names > 0 && home.count(home.ecoBadges) == names;
         });
     }
 
@@ -142,10 +142,10 @@ public class CatalogTest extends BaseUiTest {
         home.openAndWaitForProducts();
         List<String> firstPage = home.listedNames();
 
-        home.click(HomePage.NEXT_PAGE);
+        home.click(home.nextPage);
 
         expect().condition("the listing to change", () -> !home.listedNames().equals(firstPage));
-        expect().count(HomePage.PRODUCT_NAMES, 9);
+        expect().count(home.productNames, 9);
     }
 
     @Test(description = "CAT-07: an out-of-stock product cannot be added to the cart")
@@ -155,10 +155,11 @@ public class CatalogTest extends BaseUiTest {
             throw new SkipException("The shared demo currently has no out-of-stock product");
         }
 
-        new ProductPage(driver()).open(product.id());
+        ProductPage productPage = new ProductPage(driver());
+        productPage.open(product.id());
 
-        expect().visible(ProductPage.OUT_OF_STOCK);
-        expect().disabled(ProductPage.ADD_TO_CART);
+        expect().visible(productPage.outOfStock);
+        expect().disabled(productPage.addToCartButton);
     }
 
     @Test(description = "RNT-01: the rentals page lists rental products")
@@ -202,13 +203,13 @@ public class CatalogTest extends BaseUiTest {
         NavBar nav = new NavBar(driver());
         open("/");
 
-        nav.click(NavBar.CONTACT);
+        nav.click(nav.contact);
         expect().url("/contact$");
         nav.openCategory("nav-rentals");
         expect().url("/rentals$");
-        nav.click(NavBar.SIGN_IN);
+        nav.click(nav.signIn);
         expect().url("/auth/login$");
-        nav.click(NavBar.HOME);
+        nav.click(nav.home);
         expect().url(Env.HOME_URL);
     }
 }
