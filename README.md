@@ -13,7 +13,7 @@ Java 21, Maven Wrapper, Selenium 4, TestNG, REST Assured, JDBC (MariaDB), axe-co
 | UI, customer | `tests/ui/` | Catalog, product, comparison, cart, checkout (5 payment methods, guest), auth, contact, account |
 | UI, admin | `tests/ui/admin/` | Menu, reports, brands, categories, products, orders, users, messages |
 | API | `tests/api/` | All 81 operations in the OpenAPI document, with permissions and validation |
-| Database | `tests/db/`, `db/` | SQL against the real schema. **Placeholder tier**: the demo exposes no database, so these skip unless `DB_URL` is set |
+| Database | `tests/db/`, `db/` | SQL against the real schema. The public demo exposes no database, so these skip locally unless `DB_URL` is set; CI runs them against a private instance |
 | Quality | `tests/quality/` | axe-core accessibility, screenshot regression (local only) |
 
 ## Architecture
