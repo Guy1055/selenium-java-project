@@ -2,6 +2,7 @@ package com.toolshop.tests.ui;
 
 import com.toolshop.api.ToolshopApi;
 import com.toolshop.core.BaseUiTest;
+import com.toolshop.core.Env;
 import com.toolshop.data.TestData;
 import com.toolshop.pages.BasePage;
 import com.toolshop.pages.CartPage;
@@ -79,7 +80,7 @@ public class CartTest extends BaseUiTest {
 
         cart.click(CartPage.CONTINUE_SHOPPING);
 
-        expect().url("practicesoftwaretesting\\.com/$");
+        expect().url(Env.HOME_URL);
         expect().text(ProductPage.CART_BADGE, "1");
     }
 

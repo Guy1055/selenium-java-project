@@ -60,4 +60,4 @@ On Windows use `mvnw.cmd` in place of `./mvnw`. Chrome must be installed; Seleni
 | `UPDATE_SNAPSHOTS` | Rewrite the visual baselines |
 
 ## CI
-[`.github/workflows/selenium.yml`](.github/workflows/selenium.yml) runs the `sanity` group on every push and the full suite nightly and on demand. Surefire reports and failure screenshots are kept as artifacts.
+[`.github/workflows/selenium.yml`](.github/workflows/selenium.yml) runs the `sanity` group on every push and the full suite nightly and on demand. The public site shows a Cloudflare check to data-center IPs, so CI starts a private copy of Toolshop in Docker and tests that, which also gives the SQL tier a real database. Surefire reports and failure screenshots are kept as artifacts.

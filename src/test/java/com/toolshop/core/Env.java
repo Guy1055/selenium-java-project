@@ -12,6 +12,9 @@ public final class Env {
     /** JDBC URL for the database tier, e.g. jdbc:mariadb://localhost:3306/toolshop?user=user&password=root. */
     public static final String DB_URL = System.getenv("DB_URL");
 
+    /** Regex for the storefront home page on whichever environment is under test. */
+    public static final String HOME_URL = java.util.regex.Pattern.quote(BASE_URL) + "/?$";
+
     public static final String HTTPS_PROXY = System.getenv("HTTPS_PROXY");
     public static final boolean HEADLESS = System.getenv("CI") != null || System.getenv("HEADLESS") != null;
     public static final boolean UPDATE_SNAPSHOTS = System.getenv("UPDATE_SNAPSHOTS") != null;

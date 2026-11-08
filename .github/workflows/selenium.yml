@@ -26,8 +26,14 @@ jobs:
           distribution: temurin
           java-version: 21
           cache: maven
+      # The public site shows a Cloudflare check to data-center IPs, so CI tests a private copy.
+      - name: Start a private Toolshop
+        run: bash .github/scripts/start-toolshop.sh
       - name: Run tests
         env:
+          BASE_URL: http://localhost:4200
+          API_URL: http://localhost:8091
+          DB_URL: jdbc:mariadb://127.0.0.1:3306/toolshop?user=user&password=root
           TIER: ${{ github.event_name == 'push' && '-Dgroups=sanity' || '' }}
         run: ./mvnw -B test $TIER -DexcludedGroups=visual
       - name: Upload reports and failure screenshots

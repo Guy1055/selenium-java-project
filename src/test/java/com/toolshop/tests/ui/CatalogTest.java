@@ -2,6 +2,7 @@ package com.toolshop.tests.ui;
 
 import com.toolshop.api.ToolshopApi;
 import com.toolshop.core.BaseUiTest;
+import com.toolshop.core.Env;
 import com.toolshop.pages.BasePage;
 import com.toolshop.pages.HomePage;
 import com.toolshop.pages.NavBar;
@@ -208,6 +209,6 @@ public class CatalogTest extends BaseUiTest {
         nav.click(NavBar.SIGN_IN);
         expect().url("/auth/login$");
         nav.click(NavBar.HOME);
-        expect().url("practicesoftwaretesting\\.com/$");
+        expect().url(Env.HOME_URL);
     }
 }
